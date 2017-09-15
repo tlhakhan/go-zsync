@@ -6,7 +6,8 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-  "handlers"
+  	"handlers/zfs"
+  	"handlers/zpool"
 )
 
 func main() {
@@ -18,8 +19,8 @@ func main() {
 	zpoolRouter := r.PathPrefix("/api/zpool").Subrouter()
 	zfsRouter := r.PathPrefix("/api/zfs").Subrouter()
 
-  handler.zfs.NewHandler(zpoolRouter)
-  handler.zpool.NewHandler(zfsRouter)
+ zfs.NewHandler(zpoolRouter)
+ zpool.NewHandler(zfsRouter)
 
   endpoint := fmt.Sprintf(":%d", *port);
   log.Println(endpoint)
