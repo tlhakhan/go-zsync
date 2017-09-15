@@ -1,9 +1,9 @@
 package zfs
 
 import (
-	"encoding/json"
-	"bytes"
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"github.com/tlhakhan/golib/cmd"
 )
 
@@ -51,7 +51,7 @@ func (d *Daemon) processFsOut(work []byte) {
 }
 
 func (d *Daemon) processSnapOut(work []byte) {
-	tmpData := make([]dataset, 50)
+	tmpData := make([]dataset, 0, 50)
 	scanner := bufio.NewScanner(bufio.NewReader(bytes.NewBuffer(work)))
 	for scanner.Scan() {
 		tmpData = append(tmpData, dataset(scanner.Text()))
@@ -59,7 +59,19 @@ func (d *Daemon) processSnapOut(work []byte) {
 	d.Snapshots = tmpData
 }
 
-func (d *Daemon) List() []byte {
+func (d *Daemon) ListFileSystems() []byte {
 	j, _ := json.Marshal(d.FileSystems)
+	return ([]byte(j))
+}
+
+func (d *Daemon) ListSnapshots(name string) []byte {
+  tmpSnapshots := make([]dataset, 0,10)
+  for val := range d.Snapshots {
+    if strings.Split(val)[0] == name {
+      tmpSnapshots = append(tmpSnapshots, val)
+    }
+  }
+
+	j, _ := json.Marshal(tmpSnapshots)
 	return ([]byte(j))
 }
