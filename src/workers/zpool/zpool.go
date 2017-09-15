@@ -6,8 +6,6 @@ import (
 	"github.com/tlhakhan/golib/cmd"
 	"io"
 	"log"
-	"os"
-	"strings"
 )
 
 type pool string
@@ -22,7 +20,7 @@ func NewDaemon() *ZpoolDaemon {
 	return daemon
 }
 
-func (z *ZpoolDaemon) run() {
+func (z *ZpoolDaemon) run()  {
 	// Create a new command worker, sleep interval set to 10 seconds
 	work := cmd.NewWorker([]string{"zpool", "list", "-Ho", "name"}, 10)
 
@@ -42,10 +40,10 @@ func (z *ZpoolDaemon) processWork(work []byte) {
 	reader := bufio.NewReader(bytes.NewBuffer(work))
 
 	for {
-		line, err := reader.ReadString("\n")
+		line, err := reader.ReadString('\n')
 		switch err {
 		case nil:
-			tmpData = append(tmpData, line)
+			tmpData = append(tmpData, pool(line))
 		case io.EOF:
 			z.pools = tmpData
 			break
@@ -57,6 +55,6 @@ func (z *ZpoolDaemon) processWork(work []byte) {
 }
 
 // List
-func (z *ZpoolDaemon) List(datasetName string) dataset {
+func (z *ZpoolDaemon) List() []pool {
 	return z.pools
 }

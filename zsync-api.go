@@ -21,7 +21,7 @@ func main() {
 	zpoolRouter := r.PathPrefix("/api/zpool").Subrouter()
 	zfsRouter := r.PathPrefix("/api/zfs").Subrouter()
 
-	zfs.NewHandler(zfsrouter)
+	zfs.NewHandler(zfsRouter)
 	zpool.NewHandler(zpoolRouter)
 
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), r))
