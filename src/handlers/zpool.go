@@ -1,4 +1,4 @@
-package zpoolHandler
+package zpool
 
 import(
   "fmt"

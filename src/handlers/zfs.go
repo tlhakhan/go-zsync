@@ -1,4 +1,4 @@
-package zpoolHandler
+package zfs
 
 import(
   "fmt"
