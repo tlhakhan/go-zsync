@@ -2,7 +2,6 @@ package zfs
 
 import (
 	"github.com/gorilla/mux"
-  "git"
 	"net/http"
 )
 
