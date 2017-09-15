@@ -17,8 +17,9 @@ func main() {
 	zfsRouter := r.PathPrefix("/api/zfs").Subrouter()
 	zpoolRouter.Methods("GET").Path("/list").HandlerFunc(zpoolHandler)
 	zfsRouter.Methods("GET").Path("/{poolName}/list").HandlerFunc(zfsHandler)
-
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), r))
+  endpoint := fmt.Sprintf(":%d", port);
+  log.Println(endpoint)
+	log.Fatal(http.ListenAndServe(endpoint, r))
 }
 
 func zpoolHandler(w http.ResponseWriter, r *http.Request) {
