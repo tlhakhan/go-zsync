@@ -1,6 +1,7 @@
 package zfs
 
 import (
+	"strings"
 	"bufio"
 	"bytes"
 	"encoding/json"
@@ -9,12 +10,11 @@ import (
 
 type Daemon struct {
 	Pool string `json:pool`
-	// all zfs datasets
-	FileSystems []dataset
-	Snapshots   []dataset
+	// all zfs strings
+	FileSystems []string
+	Snapshots   []string
 }
 
-type dataset string
 
 func NewDaemon(pool string) *Daemon {
 	d := &Daemon{Pool: pool}
@@ -42,19 +42,19 @@ func (d *Daemon) run() {
 
 func (d *Daemon) processFsOut(work []byte) {
 
-	tmpData := make([]dataset, 0, 50)
+	tmpData := make([]string, 0, 50)
 	scanner := bufio.NewScanner(bufio.NewReader(bytes.NewBuffer(work)))
 	for scanner.Scan() {
-		tmpData = append(tmpData, dataset(scanner.Text()))
+		tmpData = append(tmpData, string(scanner.Text()))
 	}
 	d.FileSystems = tmpData
 }
 
 func (d *Daemon) processSnapOut(work []byte) {
-	tmpData := make([]dataset, 0, 50)
+	tmpData := make([]string, 0, 50)
 	scanner := bufio.NewScanner(bufio.NewReader(bytes.NewBuffer(work)))
 	for scanner.Scan() {
-		tmpData = append(tmpData, dataset(scanner.Text()))
+		tmpData = append(tmpData, string(scanner.Text()))
 	}
 	d.Snapshots = tmpData
 }
@@ -65,9 +65,9 @@ func (d *Daemon) ListFileSystems() []byte {
 }
 
 func (d *Daemon) ListSnapshots(name string) []byte {
-  tmpSnapshots := make([]dataset, 0,10)
-  for val := range d.Snapshots {
-    if strings.Split(val)[0] == name {
+  tmpSnapshots := make([]string, 0,10)
+  for _, val := range d.Snapshots {
+    if strings.Split(val, "@")[0] == name {
       tmpSnapshots = append(tmpSnapshots, val)
     }
   }
