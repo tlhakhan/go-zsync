@@ -3,10 +3,14 @@ package zfs
 import (
 	"github.com/gorilla/mux"
 	"net/http"
+	"workers/zfs"
 )
 
-func NewHandler(r *mux.Router) {
-	r.Methods("GET").Path("{poolName}/list").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("zfs list"))
+func NewHandler(r *mux.Router, zpool string) {
+
+	zfsD := zfs.NewDaemon(zpool)
+
+	r.Methods("GET").Path("{poolName}/list").HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+		res.Write(zfsD.List())
 	})
 }
