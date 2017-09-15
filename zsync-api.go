@@ -2,15 +2,17 @@ package main
 
 import (
 	"flag"
-  "fmt"
+	"fmt"
 	"github.com/gorilla/mux"
+	"handlers/zfs"
+	"handlers/zpool"
 	"log"
 	"net/http"
-  	"handlers/zfs"
-  	"handlers/zpool"
 )
 
 func main() {
+
+  // get a port number to start on
 	var port = flag.Int("p", 8089, "api listen port")
 	flag.Parse()
 
@@ -19,11 +21,9 @@ func main() {
 	zpoolRouter := r.PathPrefix("/api/zpool").Subrouter()
 	zfsRouter := r.PathPrefix("/api/zfs").Subrouter()
 
- zfs.NewHandler(zpoolRouter)
- zpool.NewHandler(zfsRouter)
+	zfs.NewHandler(zfsrouter)
+	zpool.NewHandler(zpoolRouter)
 
-  endpoint := fmt.Sprintf(":%d", *port);
-  log.Println(endpoint)
-	log.Fatal(http.ListenAndServe(endpoint, r))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), r))
 
 }

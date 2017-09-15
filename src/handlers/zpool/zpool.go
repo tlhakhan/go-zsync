@@ -1,12 +1,16 @@
 package zpool
 
-import(
-  "github.com/gorilla/mux"
-  "net/http"
+import (
+	"github.com/gorilla/mux"
+	"net/http"
+	"workers/zpool"
 )
 
 func NewHandler(r *mux.Router) {
-  r.Methods("GET").Path("/list").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte("zpool list"));
-  })
+
+	d := zpool.NewDaemon()
+
+	r.Methods("GET").Path("/list").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(d.List())
+	})
 }
