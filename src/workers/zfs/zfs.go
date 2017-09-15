@@ -15,6 +15,6 @@ func NewDaemon(pool string) {
 }
 
 func (*d Daemon) List() {
-  j,_ := json.Marshal(d.Pool);
+  j,_ := json.Marshal(d.pool);
   return([]byte(j));
 }

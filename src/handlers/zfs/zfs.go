@@ -10,7 +10,7 @@ func NewHandler(r *mux.Router, zpool string) {
 
 	zfsD := zfs.NewDaemon(zpool)
 
-	r.Methods("GET").Path("{poolName}/list").HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+	r.Methods("GET").Path("/list").HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		res.Write(zfsD.List())
 	})
 }
