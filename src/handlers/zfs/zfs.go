@@ -13,4 +13,5 @@ func NewHandler(r *mux.Router, zpool string) {
 	r.Methods("GET").Path("/list").HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		res.Write(zfsD.List())
 	})
+  
 }
