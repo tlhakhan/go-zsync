@@ -1,20 +1,18 @@
 package zfs
 
 import(
-  "fmt"
+	"encoding/json"
 )
 
 type Daemon struct {
-  Pool: string `json:pool`
+  pool string `json:pool`
 }
 
-func NewDaemon(pool string) {
-  return &Daemon{
-    pool: pool
-  }
+func NewDaemon(pool string) *Daemon {
+  return &Daemon{pool:pool}
 }
 
-func (*d Daemon) List() {
-  j,_ := json.Marshal(d.Pool);
+func (d *Daemon) List() []byte {
+  j,_ := json.Marshal(d.pool);
   return([]byte(j));
 }

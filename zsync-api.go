@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"handlers/zfs"
-	"handlers/zpool"
 	"log"
 	"net/http"
 )
