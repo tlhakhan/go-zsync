@@ -6,6 +6,8 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+  "handlers/zpoolHandler"
+  "handlers/zfsHandler"
 )
 
 func main() {
@@ -13,19 +15,15 @@ func main() {
 	flag.Parse()
 
 	r := mux.NewRouter()
+
 	zpoolRouter := r.PathPrefix("/api/zpool").Subrouter()
 	zfsRouter := r.PathPrefix("/api/zfs").Subrouter()
-	zpoolRouter.Methods("GET").Path("/list").HandlerFunc(zpoolHandler)
-	zfsRouter.Methods("GET").Path("/{poolName}/list").HandlerFunc(zfsHandler)
+
+  zpoolHandler.NewHandler(zpoolRouter)
+  zfsHandler.NewHandler(zfsRouter)
+
   endpoint := fmt.Sprintf(":%d", *port);
   log.Println(endpoint)
 	log.Fatal(http.ListenAndServe(endpoint, r))
-}
 
-func zpoolHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Zpool Test"))
-}
-
-func zfsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Zfs Test"))
 }
