@@ -1,12 +1,17 @@
 package zfs
 
 import (
+	"log"
 	"strings"
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"github.com/tlhakhan/golib/cmd"
 )
+
+const (
+	FILESYSTEM = iota
+	SNAPSHOT = iota
+)
+
 
 type Daemon struct {
 	Pool string `json:pool`
@@ -25,53 +30,63 @@ func NewDaemon(pool string) *Daemon {
 func (d *Daemon) run() {
 
 	// zfs list -Hro name,origin -t filesystem clusters
-	fsWorker := cmd.NewWorker([]string{"zfs", "list", "-Hro", "name", "-t", "filesystem", d.Pool}, 10)
-	snapWorker := cmd.NewWorker([]string{"zfs", "list", "-Hro", "name", "-t", "snapshot", d.Pool}, 10)
+	fsWorker := cmd.NewWorker([]string{"zfs", "list", "-Hro", "name", "-t", "filesystem", d.Pool}, 2)
+	snapWorker := cmd.NewWorker([]string{"zfs", "list", "-Hro", "name", "-t", "snapshot", d.Pool}, 3)
 
 	// listens for new output sent on worker channels
 	for {
 		select {
 		case fsOut := <-fsWorker:
-			d.processFsOut(fsOut)
+			d.processOutput(fsOut, FILESYSTEM)
 		case snapOut := <-snapWorker:
-			d.processSnapOut(snapOut)
+			d.processOutput(snapOut, SNAPSHOT)
 		default:
 		}
 	}
 }
 
-func (d *Daemon) processFsOut(work []byte) {
-
-	tmpData := make([]string, 0, 50)
-	scanner := bufio.NewScanner(bufio.NewReader(bytes.NewBuffer(work)))
-	for scanner.Scan() {
-		tmpData = append(tmpData, string(scanner.Text()))
+func (d *Daemon) processOutput(work string, type int) {
+	switch type{
+	case FILESYSTEM:
+		log.Println("Adding zfs filesystems to Daemon struct.")
+		d.FileSystems = strings.Split(work, "\n")
+	case SNAPSHOT:
+		log.Println("Adding zfs snapshots to Daemon struct.")
+		d.Snapshots = strings.Split(work, "\n")
 	}
-	d.FileSystems = tmpData
 }
 
-func (d *Daemon) processSnapOut(work []byte) {
-	tmpData := make([]string, 0, 50)
-	scanner := bufio.NewScanner(bufio.NewReader(bytes.NewBuffer(work)))
-	for scanner.Scan() {
-		tmpData = append(tmpData, string(scanner.Text()))
-	}
-	d.Snapshots = tmpData
-}
+func (d *Daemon) ListFileSystems(name string) []byte {
 
-func (d *Daemon) ListFileSystems() []byte {
-	j, _ := json.Marshal(d.FileSystems)
-	return ([]byte(j))
+  if len(name) > 0 {
+    found := false
+    for _, value := range d.FileSystems {
+      if value == name {
+        found = true;
+        break
+      }
+    }
+  	return ([]byte(found))
+
+  } else {
+    j, _ := json.Marshal(d.FileSystems)
+  	return ([]byte(j))
+  }
+
 }
 
 func (d *Daemon) ListSnapshots(name string) []byte {
-  tmpSnapshots := make([]string, 0,10)
-  for _, val := range d.Snapshots {
-    if strings.Split(val, "@")[0] == name {
-      tmpSnapshots = append(tmpSnapshots, val)
-    }
+
+	tmpSnapshots := make([]string, 0,10)
+  if len(name) > 0 {
+		for _, val := range d.Snapshots {
+			if strings.Split(val, "@")[0] == name {
+				tmpSnapshots = append(tmpSnapshots, val)
+			}
+		}
+  } else {
+    j, _ := json.Marshal(d.Snapshots)
+  	return ([]byte(j))
   }
 
-	j, _ := json.Marshal(tmpSnapshots)
-	return ([]byte(j))
 }
